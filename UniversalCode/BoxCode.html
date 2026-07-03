@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万能码生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            margin-top: 10px;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .result-area {
+            margin-top: 25px;
+        }
+        .result-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .code-list {
+            list-style: none;
+        }
+        .code-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            word-break: break-all;
+        }
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+        .copy-btn:hover {
+            background: #5a6fd6;
+        }
+        .copy-btn.copied {
+            background: #28a745;
+        }
+        .date-table {
+            margin-top: 25px;
+            border-top: 1px solid #eee;
+            padding-top: 25px;
+        }
+        .date-table h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .table-wrapper {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        .date-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .date-table th,
+        .date-table td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        .date-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        .date-table td:first-child {
+            color: #666;
+        }
+        .date-table td:last-child {
+            font-weight: 600;
+            color: #667eea;
+        }
+        .today-badge {
+            background: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .error-msg {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔑 万能码生成器</h1>
+            <p>前八位随机字母数字 + 5Z9Z1M + 日期对应码</p>
+        </div>
+        
+        <div class="card">
+            <div class="form-group">
+                <label for="daySelect">选择日期 <span id="todayIndicator"></span></label>
+                <select id="daySelect">
+                    <option value="">请选择日期</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="countInput">生成数量</label>
+                <input type="number" id="countInput" value="1" min="1" max="50">
+            </div>
+            
+            <button class="btn btn-primary" onclick="generateCodes()">生成万能码</button>
+            <button class="btn btn-secondary" onclick="clearResults()">清空结果</button>
+            
+            <div class="error-msg" id="errorMsg"></div>
+            
+            <div class="result-area" id="resultArea" style="display: none;">
+                <div class="result-title">
+                    生成结果
+                    <span class="today-badge" id="todayBadge" style="display: none;">今天</span>
+                </div>
+                <ul class="code-list" id="codeList"></ul>
+            </div>
+            
+            <div class="date-table">
+                <h3>📅 日期对应表</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>对应码</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dateTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dateCodeMap = {
+            2: 'VY', 3: 'VZ', 4: 'W1', 5: 'W2', 6: 'W3', 7: 'W4', 8: 'W5', 9: 'W6', 10: 'W7',
+            11: 'W8', 12: 'W9', 13: 'WA', 14: 'WB', 15: 'WC', 16: 'WD', 17: 'WE', 18: 'WF', 19: 'WG',
+            20: 'WH', 21: 'WI', 22: 'WJ', 23: 'WK', 24: 'WL', 25: 'WM', 26: 'WN', 27: 'WO', 28: 'WP',
+            29: 'WQ', 30: 'WR', 31: 'WS'
+        };
+
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function generateUniversalCode(day) {
+            if (!dateCodeMap[day]) {
+                throw new Error('日期必须为2-31号');
+            }
+            const prefix = generateRandomString(8);
+            const middle = '5Z9Z1M';
+            const suffix = dateCodeMap[day];
+            return prefix + middle + suffix;
+        }
+
+        function init() {
+            const today = new Date();
+            const todayDay = today.getDate();
+            const daySelect = document.getElementById('daySelect');
+            
+            for (let day = 2; day <= 31; day++) {
+                const option = document.createElement('option');
+                option.value = day;
+                option.textContent = day + '号';
+                if (day === todayDay) {
+                    option.selected = true;
+                    option.textContent += ' (今天)';
+                }
+                daySelect.appendChild(option);
+            }
+            
+            const dateTableBody = document.getElementById('dateTableBody');
+            for (let day = 2; day <= 31; day++) {
+                const row = document.createElement('tr');
+                if (day === todayDay) {
+                    row.style.backgroundColor = '#d4edda';
+                }
+                row.innerHTML = `<td>${day}号</td><td>${dateCodeMap[day]}</td>`;
+                dateTableBody.appendChild(row);
+            }
+        }
+
+        function generateCodes() {
+            const daySelect = document.getElementById('daySelect');
+            const countInput = document.getElementById('countInput');
+            const resultArea = document.getElementById('resultArea');
+            const codeList = document.getElementById('codeList');
+            const errorMsg = document.getElementById('errorMsg');
+            const todayBadge = document.getElementById('todayBadge');
+            
+            const day = parseInt(daySelect.value);
+            const count = parseInt(countInput.value);
+            
+            errorMsg.style.display = 'none';
+            
+            if (!day) {
+                errorMsg.textContent = '请选择日期';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            
+            if (!count || count < 1 || count > 50) {
+                errorMsg.textContent = '生成数量必须在1-50之间';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            
+            codeList.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                const code = generateUniversalCode(day);
+                const li = document.createElement('li');
+                li.className = 'code-item';
+                li.innerHTML = `
+                    <span>${code}</span>
+                    <button class="copy-btn" onclick="copyCode(this, '${code}')">复制</button>
+                `;
+                codeList.appendChild(li);
+            }
+            
+            const today = new Date().getDate();
+            todayBadge.style.display = day === today ? 'inline-block' : 'none';
+            resultArea.style.display = 'block';
+        }
+
+        function copyCode(btn, code) {
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = '已复制';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = code;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                const originalText = btn.textContent;
+                btn.textContent = '已复制';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function clearResults() {
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('codeList').innerHTML = '';
+        }
+
+        init();
+    </script>
+</body>
+</html>
