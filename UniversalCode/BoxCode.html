@@ -242,10 +242,10 @@
 
     <script>
         const dateCodeMap = {
-            2: 'VY', 3: 'VZ', 4: 'W1', 5: 'W2', 6: 'W3', 7: 'W4', 8: 'W5', 9: 'W6', 10: 'W7',
-            11: 'W8', 12: 'W9', 13: 'WA', 14: 'WB', 15: 'WC', 16: 'WD', 17: 'WE', 18: 'WF', 19: 'WG',
-            20: 'WH', 21: 'WI', 22: 'WJ', 23: 'WK', 24: 'WL', 25: 'WM', 26: 'WN', 27: 'WO', 28: 'WP',
-            29: 'WQ', 30: 'WR', 31: 'WS'
+            4: 'W0', 5: 'W1', 6: 'W2', 7: 'W3', 8: 'W4', 9: 'W5', 10: 'W6', 11: 'W7',
+            12: 'W8', 13: 'W9', 14: 'WA', 15: 'WB', 16: 'WC', 17: 'WD', 18: 'WE', 19: 'WF', 20: 'WG',
+            21: 'WH', 22: 'WI', 23: 'WJ', 24: 'WK', 25: 'WL', 26: 'WM', 27: 'WN', 28: 'WO', 29: 'WP',
+            30: 'WQ', 31: 'WR'
         };
 
         function generateRandomString(length) {
@@ -259,7 +259,7 @@
 
         function generateUniversalCode(day) {
             if (!dateCodeMap[day]) {
-                throw new Error('日期必须为2-31号');
+                throw new Error('日期必须为4-31号');
             }
             const prefix = generateRandomString(8);
             const middle = '5Z9Z1M';
@@ -272,7 +272,7 @@
             const todayDay = today.getDate();
             const daySelect = document.getElementById('daySelect');
             
-            for (let day = 2; day <= 31; day++) {
+            for (let day = 4; day <= 31; day++) {
                 const option = document.createElement('option');
                 option.value = day;
                 option.textContent = day + '号';
@@ -284,7 +284,7 @@
             }
             
             const dateTableBody = document.getElementById('dateTableBody');
-            for (let day = 2; day <= 31; day++) {
+            for (let day = 4; day <= 31; day++) {
                 const row = document.createElement('tr');
                 if (day === todayDay) {
                     row.style.backgroundColor = '#d4edda';
