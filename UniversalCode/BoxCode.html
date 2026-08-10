@@ -337,29 +337,28 @@
         }
 
         function copyCode(btn, code) {
-            navigator.clipboard.writeText(code).then(() => {
-                const originalText = btn.textContent;
+            const originalText = btn.textContent;
+            
+            function showCopied() {
                 btn.textContent = '已复制';
                 btn.classList.add('copied');
                 setTimeout(() => {
                     btn.textContent = originalText;
                     btn.classList.remove('copied');
                 }, 2000);
-            }).catch(() => {
+            }
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(showCopied);
+            } else {
                 const textarea = document.createElement('textarea');
                 textarea.value = code;
                 document.body.appendChild(textarea);
                 textarea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
-                const originalText = btn.textContent;
-                btn.textContent = '已复制';
-                btn.classList.add('copied');
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.classList.remove('copied');
-                }, 2000);
-            });
+                showCopied();
+            }
         }
 
         function clearResults() {
